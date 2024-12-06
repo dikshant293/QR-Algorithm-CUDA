@@ -27,6 +27,14 @@ This project demonstrates a GPU-accelerated QR-based eigenvalue computation usin
 - **OpenMP:**  
   Typically included by default in modern compilers. The NVIDIA HPC SDK supports OpenMP offloading if needed.
 
+### Optional Profiling Tools
+- **Nsight Systems** and **nvprof** (part of CUDA toolkit) for profiling:
+  ```bash
+  # Installed as part of the CUDA toolkit
+  nsys --version
+  nvprof --version
+  ```
+
 ## Installation Steps
 
 1. **Install NVIDIA HPC SDK:**
@@ -84,19 +92,33 @@ This will:
   make run N=50
   ```
 
-### Example Output (50x50 Matrix)
-```
-$ make run N=50
-nvc++ main.cu -lcudart -lcublas -lcusolver -llapacke -llapack -lblas -use_fast_math -Xcompiler -fopenmp -lopenblas -O3 --diag_suppress set_but_not_used -o eigenvalue_test -DPSIZE=50
-./eigenvalue_test
-size = 0.000019 GB
+### Example Output (5000x5000 Matrix)
 
-check = 62475.000000
-computation took 0.13757 seconds
+Testing System: NVIDIA RTX 3060 GPU (6 GB VRAM, 130 W TDP)
+
+```
+$ make run N=5000
+nvc++ main.cu -lcudart -lcublas -lcusolver -llapacke -llapack -lblas -use_fast_math -Xcompiler -fopenmp -lopenblas -O3 --diag_suppress set_but_not_used -o eigenvalue_test -DPSIZE=5000
+./eigenvalue_test
+size = 0.186265 GB
+
+check = 62499997500.000015
+computation took 37.009 seconds
 ```
 
 - **`check`**: A diagnostic value derived from the computed `Q` matrix (sum of its diagonal elements), used as a simple convergence check.
 - **`computation took ... seconds`**: Time measured for the QR computation and eigenvalue iteration steps.
+
+## Profiling (Optional)
+To profile with Nsight Systems or `nvprof`:
+```bash
+make sys
+```
+This runs:
+```bash
+nsys nvprof ./eigenvalue_test
+```
+Adjust commands based on the tools installed and your profiling needs.
 
 ## Notes
 - Adjust `PSIZE` to scale the problem size and observe performance differences.
