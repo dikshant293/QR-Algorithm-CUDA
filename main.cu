@@ -126,15 +126,6 @@ double* qr(double *d_A, double *d_R, double *d_B, int m, int n, int lda){
         &beta,
         d_B, lda
     );
-
-    // // Copy back to host
-    // double *h_A_reconstructed = (double *)malloc(m * n * sizeof(double));
-    // cudaMemcpy(h_A_reconstructed, d_B, sizeof(double) * m * n, cudaMemcpyDeviceToHost);
-    // transposeMatrix(h_A_reconstructed,m,n);
-    // printMatrix(h_A_reconstructed,m,n);
-
-    // // Clean up
-    // free(h_A_reconstructed);
     cudaFree(d_Tau);
     cudaFree(d_Work);
     cudaFree(devInfo);
@@ -165,7 +156,6 @@ void eig(double *d_A, double *d_R, double *d_B, int m, int n, int lda, double *h
     transposeMatrix(h_R,m,n);
     double check = 0.0;
     for(int i=0;i<m;i++){
-        // printf("%lf\n",h_Q[i*m+i]);
         check+=h_Q[i*m+i];
     }
     printf("\ncheck = %lf\n",check);
@@ -182,7 +172,6 @@ int main(int argc, char** argv) {
     printf("size = %lf GB\n",(double)m*n*sizeof(double)/1024/1024/1024);
     // Host memory allocation
     double *h_A = (double *)malloc(m * n * sizeof(double));
-    // Copy results back to host
     double *h_Q = (double *)malloc(m * n * sizeof(double));
     double *h_R = (double *)malloc(m * n * sizeof(double));
 
@@ -208,18 +197,6 @@ int main(int argc, char** argv) {
     eig(d_A,d_R,d_B,m,n,lda,h_Q,h_R);
     
     end_timer("computation");
-    
-    
-    // transposeMatrix(h_A,m,n);
-    // // (Optional) Verify the decomposition
-    // #if defined(PRT)
-    // printMatrix(h_A,m,n);
-    // printMatrix(h_Q,m,n);
-    // printMatrix(h_R,m,n);
-    // #endif
-
-    // Compare h_A_reconstructed with h_A
-
 
     free(h_A);
     free(h_Q);
